@@ -79,9 +79,10 @@ export default SellPage;*/
 import React, { useState } from 'react';
 import "../components/BookingPage.scss";
 import { Link } from 'react-router-dom';
+import productService from '../services/productService';
 
 const PostAdForm = () => {
-  const [adDetails, setAdDetails,onSelect,selected] = useState({
+  const [adDetails, setAdDetails, onSelect, selected] = useState({
     category: '',
     adType: '',
     saleBy: '',
@@ -91,7 +92,7 @@ const PostAdForm = () => {
     title: '',
     description: '',
     tags: [],
-  
+
   });
 
   const [media, setMedia] = useState({
@@ -135,150 +136,185 @@ const PostAdForm = () => {
       photos: [],
       youtubeVideo: '',
     });
-};
-    const handlePhotoChange = (event) => {
-      if (event.target.files && event.target.files[0]) {
-        const fileReader = new FileReader();
-        
-        fileReader.onload = (e) => {
-          setMedia((prevState) => ({
-            ...prevState,
-            photos: [...prevState.photos, e.target.result],
-          }));
-        };
-  
-        fileReader.readAsDataURL(event.target.files[0]);
-      }
-    };
-  
-    const handleYouTubeChange = (event) => {
-      setMedia((prevState) => ({
+  };
+  const handlePhotoChange = async (event) => {
+    if (event.target.files && event.target.files[0]) {
+      const fileReader = new FileReader();
+
+      fileReader.onload = (e) => {
+        setMedia((prevState) => ({
+          ...prevState,
+          photos: [...prevState.photos, e.target.result],
+        }));
+      };
+
+      fileReader.readAsDataURL(event.target.files[0]);
+      const base64 = await convertToBase64(event.target.files[0]);
+    }
+  };
+
+  const convertToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const fileReader = new FileReader();
+      fileReader.readAsDataURL(file);
+      fileReader.onload = () => {
+        resolve(fileReader.result);
+      };
+      fileReader.onerror = (error) => {
+        reject(error);
+      };
+    });
+  };
+
+  const handleYouTubeChange = (event) => {
+    setMedia((prevState) => ({
+      ...prevState,
+      youtubeVideo: event.target.value,
+    }));
+
+  };
+
+  const removePhoto = (index) => {
+    setMedia((prevState) => ({
+      ...prevState,
+      photos: prevState.photos.filter((_, photoIndex) => photoIndex !== index),
+    }));
+
+  };
+
+  //Location section
+  const LocationSection = () => {
+    const [location, setLocation] = useState('');
+  };
+
+  const handleChange = (event) => {
+    setLocation(event.target.value);
+  };
+
+  //Price Section
+  const PriceSection = () => {
+    const [price, setPrice] = useState({
+      amount: '',
+      type: '', // For special options like 'Free', 'Please Contact', 'Swap/Trade'
+    });
+
+
+
+  };
+  const handleInputChange1 = (event) => {
+    const { name, value, type } = event.target;
+
+    // If the input type is radio and it's checked, clear the amount field
+    if (type === "radio") {
+      setPrice({ amount: '', type: value });
+    } else { // Handle changes for the amount input
+      setPrice(prevState => ({
         ...prevState,
-        youtubeVideo: event.target.value,
+        amount: value,
+        type: '', // Reset the type to ensure amount input is considered
       }));
-    
-    };
-  
-    const removePhoto = (index) => {
-      setMedia((prevState) => ({
-        ...prevState,
-        photos: prevState.photos.filter((_, photoIndex) => photoIndex !== index),
-      }));
-    
-    };
-
-    //Location section
-    const LocationSection = () => {
-        const [location, setLocation] = useState('');
-    };
-      
-        const handleChange = (event) => {
-          setLocation(event.target.value);
-        };
-    
-        //Price Section
-        const PriceSection = () => {
-            const [price, setPrice] = useState({
-              amount: '',
-              type: '', // For special options like 'Free', 'Please Contact', 'Swap/Trade'
-            });
-        
-          
-            
-        };
-        const handleInputChange1 = (event) => {
-            const { name, value, type } = event.target;
-        
-            // If the input type is radio and it's checked, clear the amount field
-            if (type === "radio") {
-              setPrice({ amount: '', type: value });
-            } else { // Handle changes for the amount input
-              setPrice(prevState => ({
-                ...prevState,
-                amount: value,
-                type: '', // Reset the type to ensure amount input is considered
-              }));
-            }
-        };
-//Contact section
-        const ContactInformationSection = () => {
-            const [contactInfo, setContactInfo] = useState({
-              phoneNumber: '',
-              email: '',
-            });
-        };
-            const handleInputChange2 = (event) => {
-              const { name, value } = event.target;
-              setContactInfo((prevState) => ({
-                ...prevState,
-                [name]: value,
-              }));
-            };
-        
+    }
+  };
+  //Contact section
+  const ContactInformationSection = () => {
+    const [contactInfo, setContactInfo] = useState({
+      phoneNumber: '',
+      email: '',
+    });
+  };
+  const handleInputChange2 = (event) => {
+    const { name, value } = event.target;
+    setContactInfo((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
 
 
-          
+  const handleSubmit = (e) => {
+    e.preventDefault();
 
-  // Handlers for changes in the form inputs would go here
-  // For brevity, these are not implemented in this example
+    const reqBody = {
+      "category": adDetails.category,
+      "type": adDetails.type,
+      "title": adDetails.title,
+      "description": adDetails.description,
+      "add_photos": "photo_url",
+      "add_videos": "video_url",
+      "location": location,
+      "price": price.amount,
+      "phone_number": contactInfo.phoneNumber,
+      "remail": contactInfo.email
+    }
 
-  return (
-    
-    <form>
-    
-      <div className='post'>
-        <h2>Ad Details</h2>
-        
-             
-             <label htmlFor="category">Select Category:</label>
-             <select name="category" value={adDetails.category} onChange={handleInputChange}>
-             <option value="">Select a category</option>
-                <option value="electronics">Electronics</option>
-                <option value="vehicles">Vehicle</option>
-                <option value="furniture">Furniture</option>
-                <option value="stationery">Stationery</option>
-                <option value="books">Books</option>
-               
-                <option value="gym equipments">Gym equipments</option>
-                <option value="Free Goods">Free Goods</option>
-  
-               {/* Add more options here */}
-             </select>
-       
-             <div>
-               <p>Ad Type:</p>
-               <label>
-                 <input type="radio" name="adType" value="I'm offering" checked={adDetails.adType === "I'm offering"} onChange={handleInputChange} />
-                 I'm offering - You are offering an item for sale
-               </label><br></br>
-               <label>
-                 <input type="radio" name="adType" value="I want to find" checked={adDetails.adType === "I want to find"} onChange={handleInputChange} />
-                 I want to find - You want to buy an item
-               </label>
-             </div><br></br>
-       
-             <label htmlFor="title">Ad title:</label>
-             <input type="text" name="title" value={adDetails.title} onChange={handleInputChange} />
-       
-             <label htmlFor="description">Description:</label>
-             <textarea name="description" value={adDetails.description} onChange={handleInputChange}></textarea>
-       
-   
-           </div>
-     
-       
-     
+    const res = productService.createProduct(reqBody);
+    console.log(reqBody);
+    console.log(res);
+    //console.log('Form submitted:', { propertyType, numBedrooms, numBaths, squareFeet, description, images, location, address });
+  };
+  //console.log('Form submitted:', adDetails);
 
-      {/* Media section */}
+
+// Handlers for changes in the form inputs would go here
+// For brevity, these are not implemented in this example
+
+return (
+
+  <form onSubmit={handleSubmit}>
+
+    <div className='post'>
+      <h2>Ad Details</h2>
+
+
+      <label htmlFor="category">Select Category:</label>
+      <select name="category" value={adDetails.category} onChange={handleInputChange}>
+        <option value="">Select a category</option>
+        <option value="electronics">Electronics</option>
+        <option value="vehicles">Vehicle</option>
+        <option value="furniture">Furniture</option>
+        <option value="stationery">Stationery</option>
+        <option value="books">Books</option>
+
+        <option value="gym equipments">Gym equipments</option>
+        <option value="Free Goods">Free Goods</option>
+
+        {/* Add more options here */}
+      </select>
+
       <div>
-        <h2>Media</h2>
-        <div>
+        <p>Ad Type:</p>
+        <label>
+          <input type="radio" name="adType" value="I'm offering" checked={adDetails.adType === "I'm offering"} onChange={handleInputChange} />
+          I'm offering - You are offering an item for sale
+        </label><br></br>
+        <label>
+          <input type="radio" name="adType" value="I want to find" checked={adDetails.adType === "I want to find"} onChange={handleInputChange} />
+          I want to find - You want to buy an item
+        </label>
+      </div><br></br>
+
+      <label htmlFor="title">Ad title:</label>
+      <input type="text" name="title" value={adDetails.title} onChange={handleInputChange} />
+
+      <label htmlFor="description">Description:</label>
+      <textarea name="description" value={adDetails.description} onChange={handleInputChange}></textarea>
+
+
+    </div>
+
+
+
+
+    {/* Media section */}
+    <div>
+      <h2>Media</h2>
+      <div>
         <label htmlFor="photos">Add photos:</label>
         <input type="file" accept="image/*" onChange={handlePhotoChange} multiple />
         <div className="photos-preview">
           {media.photos.map((photo, index) => (
             <div key={index} className="photo-container">
-              <img src={photo} alt="Uploaded" style={{width: '100px', height: '100px'}} />
+              <img src={photo} alt="Uploaded" style={{ width: '100px', height: '100px' }} />
               <button type="button" onClick={() => removePhoto(index)}>Remove</button>
             </div>
           ))}
@@ -288,13 +324,13 @@ const PostAdForm = () => {
         <label htmlFor="youtubeVideo">YouTube Video (optional):</label>
         <input type="text" name="youtubeVideo" placeholder="Enter YouTube video link" value={media.youtubeVideo} onChange={handleYouTubeChange} />
       </div>
-    
-      </div>
 
-      {/* Location section */}
-      <div>
-        <h2>Location</h2>
-        <label htmlFor="location">Your Location:</label>
+    </div>
+
+    {/* Location section */}
+    <div>
+      <h2>Location</h2>
+      <label htmlFor="location">Your Location:</label>
       <input
         type="text"
         name="location"
@@ -303,18 +339,18 @@ const PostAdForm = () => {
         onChange={handleChange}
       />
 
-     
+
       {location && (
         <p>
           Location to display: <strong>{location}</strong>
         </p>
       )}
-      </div>
+    </div>
 
-      {/* Price section */}
-      <div>
-        <h2>Price</h2>
-        <input
+    {/* Price section */}
+    <div>
+      <h2>Price</h2>
+      <input
         type="number"
         name="amount"
         placeholder="Enter price ($)"
@@ -354,15 +390,15 @@ const PostAdForm = () => {
           />
           Swap/Trade
         </label>
-            
-          
-          </div>
-      </div>
 
-      {/* Contact Information section */}
-      <div>
-        <h2>Contact Information</h2>
-        
+
+      </div>
+    </div>
+
+    {/* Contact Information section */}
+    <div>
+      <h2>Contact Information</h2>
+
       <label htmlFor="phoneNumber">Phone number (optional):</label>
       <input
         type="text"
@@ -381,15 +417,15 @@ const PostAdForm = () => {
       />
       <p>Your email address will not be shared with others.</p>
     </div>
-  
+
     <button type="submit"><Link to="/postad" className="button-like-class" onClick={onSelect}>
-      {selected ? 'Selected' : 'Post your Ad'} 
+      {selected ? 'Selected' : 'Post your Ad'}
     </Link></button>
-          
-    </form>
-  
-  );
- 
+
+  </form>
+
+);
+
 };
 
 

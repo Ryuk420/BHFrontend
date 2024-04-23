@@ -46,6 +46,7 @@ import { Link } from 'react-router-dom';
 import axios from "axios";
 
 import "../components/Login.scss";
+import userService from '../services/userService';
 
 const Login = () => {
   const [email, setEmail,onSelect,selected] = useState("");
@@ -63,11 +64,13 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("/api/auth/login", {
-        email,
-        password
-      });
-      // Handle response as needed
+      const reqBody = {
+        "email": email,
+        "password": password
+      }
+  
+      const res = await userService.loginUser(reqBody);
+      console.log(res);
     } catch (error) {
       setErrors(error.response.data.errors);
     }
@@ -104,9 +107,7 @@ const Login = () => {
             />
           </div>
         <br></br>
-        <button type="submit"><Link to="/" className="button-like-class" onClick={onSelect}>
-      {selected ? 'Selected' : 'Login'} 
-    </Link></button>
+        <button type="submit">Login</button>
     </form>
     <div className="social-login-container">
       <div className="social-login-box">

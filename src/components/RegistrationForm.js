@@ -201,13 +201,15 @@ import { FaGoogle } from "react-icons/fa";
 
 
 import "../components/Register.scss";
+import userService from '../services/userService';
 
 const Register = () => {
-  const [username, setUsername] = useState("");
+  const [firstname, setFirstname] = useState("");
+  const [lastname, setLastname] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState("");
-
+  const [isRegistered , setIsRegistered] = useState(false);
   const { setUser } = useContext(UserContext)
  
   const navigate = useNavigate();
@@ -216,16 +218,30 @@ const Register = () => {
   const registerUser = async (event) => {
     event.preventDefault();
     try {
-      const response = await axios.post("/api/auth/register", {
-        username,
-        email,
-        password
-      });
-      setUser(response.data);
-      if (response.statusText === "OK") {
-        navigate("/");
+      // const response = await axios.post("/api/auth/register", {
+      //   username,
+      //   email,
+      //   password
+      // });
+      // setUser(response.data);
+      // if (response.statusText === "OK") {
+      //   navigate("/");
+      // }
+      // console.log(response)
+      
+      const reqBody = {
+        "name": firstname+" "+lastname,
+        "email": email,
+        "password": password
       }
-      console.log(response)
+  
+      const res = await userService.createUser(reqBody);
+      //console.log(reqBody);
+      if(res.status === 200){
+        setIsRegistered(true);
+      }
+      console.log(res.data);
+
     } catch (error) {
       setErrors(error.response.data.errors)
     } 
@@ -244,12 +260,12 @@ const Register = () => {
           type="text" 
           name='username' 
           placeholder='enter your first name...'
-          value={username}
+          value={firstname}
           onChange={(event) => {
             if (errors.username) {
               errors.username = ""
             }
-            setUsername(event.target.value)
+            setFirstname(event.target.value)
           }}
           />
           </div>
@@ -260,12 +276,12 @@ const Register = () => {
           type="text" 
           name='username1' 
           placeholder='enter your last name...'
-          value={username}
+          value={lastname}
           onChange={(event) => {
             if (errors.username) {
               errors.username = ""
             }
-            setUsername(event.target.value)
+            setLastname(event.target.value)
           }}
           />
         </div>
@@ -290,7 +306,7 @@ const Register = () => {
         <div className="form--">
         <label htmlFor="password">Password</label>
             <input
-              type="text"
+              type="password"
               name="password"
               id="password"
               placeholder='provide your pasword...'
@@ -314,7 +330,11 @@ const Register = () => {
       <div className="account">
         <p>Already have an account? <Link to={"/login"}>login</Link></p>
       </div>
-   
+      {isRegistered ? (
+                <p className="text-success">You Are Registered Successfully</p>
+            ) :  ( 
+                <p className="text-danger">You Are Not Registered Yet</p>
+            )}
       </form>
       </div>
     </section>

@@ -39,7 +39,7 @@ function Dashboard() {
     <div className='container' >
       <div className="product-list" >
         {data.map(product => (
-          <div key={product.houseId} className="product-item" onClick={()=>navigate(`../apartments/${product.houseId}`)}>
+          <div key={product.houseId} className="product-item" onClick={()=>   navigate(`../apartments/${product.houseId}`)}>
             <img src={product.itemImageURL} alt={product.houseDescription} />
             <h3>{product.houseDescription}</h3>
             <p>{product.houseType}</p>

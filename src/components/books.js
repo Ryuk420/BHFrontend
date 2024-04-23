@@ -1,9 +1,27 @@
-import React from 'react';
+import React, { useState , useEffect } from 'react';
 import './Dashboard.css'; // Import the CSS file
+import productService from '../services/productService';
 
 
 function Dashboard() {
   // Define dummy products with image URLs
+
+  
+  const [itemdata ,setItemData] = useState([]);  
+  const itemData = async() => {
+    try {
+    const _item = await productService.getAllProducts()
+    setItemData(_item);
+    } catch(e) {
+        console.log(e)
+    }
+  }
+
+  useEffect
+  (() => { 
+    itemData()
+  },[])
+
   const dummyProducts = [
     { id: 1, itemName: "Dog Man", itemDescription: "The Scarlet Shedder: A Graphic Novel (Dog Man #12): From the Creator of Captain Underpants",itemPrice: "$10.99", itemImage: "https://static1.cbrimages.com/wordpress/wp-content/uploads/2024/01/dog-man-header.jpg" },
     { id: 2, itemName: "A Court of Thorns and Roses", itemDescription: "Paperback Box Set (5 books) ", itemPrice: "$55.99",  itemImage: "https://static1.squarespace.com/static/5e24e03399d8c23d1391c65b/5e24e083c77df972907ca254/5f3dc3b090c40d4c984e0e7b/1681437403119/review-a-court-of-thorns-and-roses.jpg?format=1500w" },
@@ -18,12 +36,12 @@ function Dashboard() {
   return (
     <div className='container'>
       <div className="product-list">
-        {dummyProducts.map(product => (
-          <div key={product.id} className="product-item">
-            <img src={product.itemImage} alt={product.itemName} />
-            <h3>{product.itemName}</h3>
-            <p>{product.itemDescription}</p>
-            <p>Price: {product.itemPrice} </p>
+        {itemdata.filter(product => product.category === 'books').map(product => (
+          <div key={product._id} className="product-item">
+            <img src={product.add_photos} alt={product.title} />
+            <h3>{product.title}</h3>
+            <p>{product.description}</p>
+            <p>Price: {product.price} </p>
           </div>
         ))}
       </div>

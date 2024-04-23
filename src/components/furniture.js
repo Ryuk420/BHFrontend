@@ -1,7 +1,24 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './Dashboard.css'; // Import the CSS file
+import productService from '../services/productService';
 
 function Dashboard() {
+
+  const [itemdata ,setItemData] = useState([]);  
+  const itemData = async() => {
+    try {
+    const _item = await productService.getAllProducts()
+    setItemData(_item);
+    } catch(e) {
+        console.log(e)
+    }
+  }
+
+  useEffect
+  (() => { 
+    itemData()
+  },[])
+
   // Define dummy products with image URLs
   const dummyProducts = [
     { id: 1, itemName: "Modern Living Room Sofa", itemDescription: "Upholstered Couch Linen Fabric Loveseat 68 White Used", itemPrice: "$200.69", itemImage: "https://i.ebayimg.com/images/g/2esAAOSwKNVlVOMS/s-l1600.jpg" },
@@ -17,12 +34,12 @@ function Dashboard() {
   return (
     <div className='container'>
       <div className="product-list">
-        {dummyProducts.map(product => (
-          <div key={product.id} className="product-item">
-            <img src={product.itemImage} alt={product.itemName} />
-            <h3>{product.itemName}</h3>
-            <p>{product.itemDescription}</p>
-            <p>Price: {product.itemPrice} {product.currencyType}</p>
+        {itemdata.filter(product => product.category === 'furniture').map(product => (
+          <div key={product._id} className="product-item">
+            <img src={product.add_photos} alt={product.title} />
+            <h3>{product.title}</h3>
+            <p>{product.description}</p>
+            <p>Price: {product.price}</p>
           </div>
         ))}
       </div>

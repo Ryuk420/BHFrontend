@@ -38,7 +38,7 @@ const ViewHouse = () => {
       <div className="flexColStart paddings innerWidth property-container">
 
         {/* image */}
-        <img src={data?.itemImageURL} alt="home " />
+        <img src={data?.itemImageURL} alt="home" />
 
         <div className="flexCenter property-details">
           {/* left */}

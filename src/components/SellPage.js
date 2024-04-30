@@ -78,10 +78,12 @@ export default SellPage;*/
 
 import React, { useState } from 'react';
 import "../components/BookingPage.scss";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import productService from '../services/productService';
+import "react-toastify/dist/ReactToastify.css";
+import {ToastContainer , toast } from "react-toastify";
 
-const PostAdForm = () => {
+const SellPage = () => {
   const [adDetails, setAdDetails, onSelect, selected] = useState({
     category: '',
     adType: '',
@@ -100,6 +102,7 @@ const PostAdForm = () => {
     youtubeVideo: '',
   });
   const [location, setLocation] = useState('');
+  const [imageURL, setImageURL] = useState("");
   const [price, setPrice] = useState({
     amount: '',
     type: '',
@@ -150,6 +153,7 @@ const PostAdForm = () => {
 
       fileReader.readAsDataURL(event.target.files[0]);
       const base64 = await convertToBase64(event.target.files[0]);
+      setImageURL(base64);
     }
   };
 
@@ -230,8 +234,9 @@ const PostAdForm = () => {
     }));
   };
 
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const reqBody = {
@@ -239,7 +244,7 @@ const PostAdForm = () => {
       "type": adDetails.type,
       "title": adDetails.title,
       "description": adDetails.description,
-      "add_photos": "photo_url",
+      "add_photos": imageURL,
       "add_videos": "video_url",
       "location": location,
       "price": price.amount,
@@ -247,9 +252,13 @@ const PostAdForm = () => {
       "remail": contactInfo.email
     }
 
-    const res = productService.createProduct(reqBody);
+    const res = await productService.createProduct(reqBody);
     console.log(reqBody);
     console.log(res);
+    toast.success("Item Posted Succesfully", { position: "bottom-right" });
+    setTimeout(() => { navigate("/"); }, 1000);
+    //alert("Post Successfully Added", { position: "bottom-right" });
+    //navigate("/");
     //console.log('Form submitted:', { propertyType, numBedrooms, numBaths, squareFeet, description, images, location, address });
   };
   //console.log('Form submitted:', adDetails);
@@ -418,10 +427,8 @@ return (
       <p>Your email address will not be shared with others.</p>
     </div>
 
-    <button type="submit"><Link to="/postad" className="button-like-class" onClick={onSelect}>
-      {selected ? 'Selected' : 'Post your Ad'}
-    </Link></button>
-
+    <button type="submit" className="button-like-class">Post Item</button>
+      <ToastContainer/>
   </form>
 
 );
@@ -429,6 +436,6 @@ return (
 };
 
 
-export default PostAdForm;
+export default SellPage;
 
 

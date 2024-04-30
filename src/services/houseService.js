@@ -41,6 +41,16 @@ const houseService = {
         console.error('Error deleting house:', error);
         throw error;
       }
+    },
+
+    gethouse: async (houseId) => {
+      try {
+        const response = await API.get(`/getHouse/${houseId}`);
+        return response.data;
+      } catch (error) {
+        console.error('Error deleting house:', error);
+        throw error;
+      }
     }
   };
   

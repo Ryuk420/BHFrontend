@@ -39,19 +39,27 @@ const LoginForm = ({ onClose }) => {
 export default LoginForm;*/
 
 
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { FaFacebook } from "react-icons/fa";
 import { FaGoogle } from "react-icons/fa";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from "axios";
-
 import "../components/Login.scss";
 import userService from '../services/userService';
+import UserContext from './userContext';
+
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer, toast } from "react-toastify";
 
 const Login = () => {
-  const [email, setEmail,onSelect,selected] = useState("");
+  const [email, setEmail, onSelect, selected] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState("");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const [user, setUser] = useContext(UserContext);
+
+  const navigate = useNavigate();
 
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
@@ -68,9 +76,14 @@ const Login = () => {
         "email": email,
         "password": password
       }
-  
+
       const res = await userService.loginUser(reqBody);
-      console.log(res);
+      setIsLoggedIn(true);
+      setUser(res);
+      toast.success("Login Successfull", { position: "bottom-right" });
+      setTimeout(() => { navigate("/"); }, 1000);
+
+      //console.log(user);
     } catch (error) {
       setErrors(error.response.data.errors);
     }
@@ -84,16 +97,16 @@ const Login = () => {
           <div className="form1--">
             <label htmlFor="useremail">Email:</label>
             <input
-               type="email"
-               name="useremail"
-               id="Email"
-               placeholder='Enter your email'
-               value={email}
-               onChange={handleEmailChange}
-               required
+              type="email"
+              name="useremail"
+              id="Email"
+              placeholder='Enter your email'
+              value={email}
+              onChange={handleEmailChange}
+              required
             />
           </div><br></br>
-        
+
           <div className="form--">
             <label htmlFor="password">Password:</label>
             <input
@@ -106,23 +119,27 @@ const Login = () => {
               required
             />
           </div>
-        <br></br>
-        <button type="submit">Login</button>
-    </form>
-    <div className="social-login-container">
-      <div className="social-login-box">
-        <FaFacebook />
-        <p className="text">Signin with Facebook</p>
-    </div>
-      <div className="social-login-box">
-        <FaGoogle />
-        <p className="text">Signin with Google</p>
+          <br></br>
+          <button type="submit">Login</button>
+
+        </form>
+
+        <div className="social-login-container">
+          <div className="social-login-box">
+            <FaFacebook />
+            <p className="text">Signin with Facebook</p>
+          </div>
+          <div className="social-login-box">
+            <FaGoogle />
+            <p className="text">Signin with Google</p>
+          </div>
+        </div>
+        <div className="account">
+          <p>Don't have an account? <Link to={"/register"}>Sign Up</Link></p>
+        </div>
       </div>
-    </div>
-    <div className="account">
-      <p>Don't have an account? <Link to={"/register"}>Sign Up</Link></p>
-    </div>
-    </div>
+
+      <ToastContainer />
     </section>
   );
 }

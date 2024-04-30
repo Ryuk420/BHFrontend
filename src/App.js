@@ -36,7 +36,7 @@ const App = () => {
 export default App;*/
 
 
-import React from 'react';
+import React, { useState } from 'react';
 import { ThemeProvider } from 'styled-components';
 import { BrowserRouter as Router, Route, Routes, Switch } from 'react-router-dom';
 import Header from './components/Header';
@@ -79,6 +79,7 @@ import ChatBot from 'react-simple-chatbot';
 
 import './styles.css';
 import PostAd from './components/PostAd';
+import UserContext from './components/userContext';
 
 
 const steps = [
@@ -126,7 +127,10 @@ const config = {
 
 
 const App = () => {
+
+    const [user , setUser] = useState(null);
     return (
+        <UserContext.Provider value={[user , setUser]}>
         <Router>
             <div className="app">
                 <Routes>
@@ -362,6 +366,7 @@ const App = () => {
             </div>
 
         </Router>
+        </UserContext.Provider>
 
     );
 };

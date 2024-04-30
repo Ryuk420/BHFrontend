@@ -105,8 +105,8 @@ const Header = () => {
 
 export default Header;*/
 
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useContext, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import Modal from 'react-modal';
 import logo from './logo.png'; // Import the logo image
 import RegistrationForm from './RegistrationForm';
@@ -115,12 +115,16 @@ import PostAd from './PostAd'; // Import the PostAd component
 import { FaSearch } from 'react-icons/fa';
 import '../components/Header.css'; // Import the CSS for styling
 import { FaHome, FaCar, FaBook, FaShoppingCart, FaDesktop, FaFootballBall, FaMusic, FaGamepad, FaBicycle, FaUtensils, FaBed, FaBookmark } from 'react-icons/fa';
+import UserContext from './userContext';
 
 const Header = () => {
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
     const [isRegistrationModalOpen, setIsRegistrationModalOpen] = useState(false);
     const [isPostAdModalOpen, setIsPostAdModalOpen] = useState(false); // State for PostAd modal
 
+    const [user, setUser] = useContext(UserContext);
+    const navigate = useNavigate();
+    console.log(user);
     const openLoginModal = () => {
         setIsLoginModalOpen(true);
     };
@@ -145,78 +149,92 @@ const Header = () => {
         setIsPostAdModalOpen(false);
     };
 
-    const SearchBar = () => {}
-        const [searchTerm, setSearchTerm] = useState('');
-        const [category, setCategory] = useState('all');
-    
-        const handleSearchTermChange = (e) => {
-          setSearchTerm(e.target.value);
-        };
-      
-        const handleCategoryChange = (e) => {
-          setCategory(e.target.value);
-        };
-      
-        const handleSearch = (e) => {
-          e.preventDefault();
-          console.log(`Searching for '${searchTerm}' in category '${category}'...`);
-          // Implement your search logic here
-        };
-    
-  
+    const SearchBar = () => { }
+    const [searchTerm, setSearchTerm] = useState('');
+    const [category, setCategory] = useState('all');
+
+    const handleSearchTermChange = (e) => {
+        setSearchTerm(e.target.value);
+    };
+
+    const handleCategoryChange = (e) => {
+        setCategory(e.target.value);
+    };
+
+    const handleLogout = () => {
+        setUser(null);
+    };
+
+    const handleSearch = (e) => {
+        e.preventDefault();
+        console.log(`Searching for '${searchTerm}' in category '${category}'...`);
+        // Implement your search logic here
+    };
+
+
 
     return (
         <header className="header" style={{ backgroundColor: '#97adc6' }}>
             <div className="centered-content">
-            <div className="left-section" >
-            
-        
-        <input
-          type="text1"
-          placeholder="What are you looking for?"
-          value={searchTerm}
-          onChange={handleSearchTermChange}
-          className="search-input"
-        />
-        
-          
-        <button type="submit1" className="search-button">
-          Search
-        </button>
-     
+                <div className="left-section" >
+
+
+                    <input
+                        type="text1"
+                        placeholder="What are you looking for?"
+                        value={searchTerm}
+                        onChange={handleSearchTermChange}
+                        className="search-input"
+                    />
+
+
+                    <button type="submit1" className="search-button">
+                        Search
+                    </button>
+
 
                     <div className="application-dropdown">
                         <button className="application-dropdown-button">Application </button>
                         <div className="dropdown-content">
                             <Link to="/sell"><FaShoppingCart /> Sell</Link>
-                            
+
                             <Link to="/subscription"><FaHome /> List Home</Link>
-                            
+
                         </div>
                     </div>
 
-                    
+
                 </div>
                 <div className="center-section">
-                    <Link to="/"> 
-                    <img src={logo} alt="logo" className="logo" /> 
+                    <Link to="/">
+                        <img src={logo} alt="logo" className="logo" />
                         {/* Add your logo component here */}
-                   </Link>
+                    </Link>
                 </div>
-                <div className="right-section">
-                    <nav className="nav">
-                        <ul>
-                           
-                            <li><button onClick={openRegistrationModal}>Register</button></li>
-                        
-                            <li><button onClick={openLoginModal}>Login</button></li>
-                        </ul>
-                    </nav>
-                </div>
+                {user ? (
+                    <div className='right-section'>
+                        <nav className='nav'>
+                            <ul>
+                                <li><h2>Welcome {user.name}</h2></li>
+                                <li><button onClick={handleLogout}>Logout</button></li>
+                            </ul>
+                        </nav>
+                    </div>) : (
+                    <>
+                        <div className="right-section">
+                            <nav className="nav">
+                                <ul>
+
+                                    <li><button onClick={openRegistrationModal}>Register</button></li>
+
+                                    <li><button onClick={()=>{navigate("/login")}}>Login</button></li>
+                                </ul>
+                            </nav>
+                        </div></>)}
                 <div className="promote-ads">
-                <Link to="/postad"> 
-                    <button className="post-ad-button" >Promote Ads</button>
-                    </Link> 
+                    <Link to="/postad">
+                        <button className="post-ad-button" >Promote Ads</button>
+                    </Link>
                 </div>
             </div>
             <Modal isOpen={isRegistrationModalOpen} onRequestClose={closeRegistrationModal}>
@@ -228,7 +246,7 @@ const Header = () => {
             <Modal isOpen={isPostAdModalOpen} onRequestClose={closePostAdModal}>
                 <PostAd onClose={closePostAdModal} />
             </Modal>
-           
+
         </header>
     );
 };
